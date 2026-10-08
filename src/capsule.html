@@ -36,7 +36,7 @@
     .notice.ready { --accent: #95cfaa; }
     .header { display: flex; align-items: center; gap: 9px; min-height: 24px; margin-bottom: 12px; }
     .app-mark { width: 21px; height: 21px; display: grid; place-items: center; color: var(--text); }
-    .app-mark svg { width: 18px; height: 18px; }
+    .app-mark img { width: 21px; height: 21px; object-fit: contain; }
     .app-name { color: var(--muted); font-size: 12px; font-weight: 400; }
     .close {
       width: 26px; height: 26px; margin: -3px -6px -3px auto;
@@ -89,7 +89,7 @@
 <body>
   <article class="notice" id="notice" role="status" aria-live="polite" aria-atomic="true">
     <header class="header">
-      <span class="app-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 8-11 8 11M7.6 12h8.8M8 17h8"/></svg></span>
+      <span class="app-mark" aria-hidden="true"><img data-easyag-logo="32" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEU0lEQVR4nOxXbWhWZRi+nud8v1/ui9kGLTEFLbLQmFjmn4ISCpvUD8kglj+kUss/qyUxpDBpFdGHSEE1nIFBEYmQIUGBRSNkM5mTbLWvNtz3u73nPec8H93vAqHg3c47q/3xgpvncDjnvq/7uq/nOe/LscTgWGJcJ7DkBEwsAoc/eKP+Ftl9bHW252aMevr32TUXL+lVj+x5Z89FlAiGEvHKsdd33pP8qi0znWXWmAFnlMOd5PCz5fJM4t6tu48+83Up+Uoi8OxnbWvvznx+wZkNmTkBuBMMySkDiXGF9JRALiwXbWWbq1898tRE3JwljSBlDH48rj2mVYbMY8DjHGmuscyMIMwAmdA3bwtz79GjO+LmjE3g0RMnPDf57Z3D+XKIyIOhbDjMQJkhkbOIgOtDihzqgr6HUQJi74KUDlumpMNGZBWGxXL8oZZjiNVigGLIugFDZg1G7GpYUO5re9u3xc0bWwHtzOwYE1XIBWmEIg1IDyap4EMjzwJI24eQWUg9jWQU7aNXvoiTNxaBze0ny5XRc2PWr4AfLEMYZaBDGoN2EZGPC/PXFpFQU9AsBVfqjYiJWCNICWPfFBXNBpWYDarghxXISbpWFciySozzalyxqjHi1GKYIrCSif1NZ++KkzuWApEyH5J+JfL5CkRRGrKggHTBlUkD4NS1AjNIC+bSmoSkEEbicXr17L9DgIt1MqiACDIkcxm5nQpJB1obVNRAgAIBCmZT5KEND0rprXFyLziC9e+e3x5ErhkGhcIUeQ8QCSgyIYUvlJMX3EUeZEgjhWkzg3EjA2F5dZue6/eumYACbwxp5mJOespH0mvhfZ+fFlXnmp3ET822N6NkXaTtnsAokHCRMxOYNVOsZnnZroXyLzgCCWMLFw5YlPyruEz82Nls/81gPx9I9NOyZtMhdRmMrwQ3yBsCQuMJuv82FqvAmta++3VkpBUV14qKKy/bec4q6u6RSbY+1CwMqK8ctyi7efuGo9paNAHOeJOmeYMU0NKGEvxBfMpksed/Pczok8Sfjug6VBx5zY30pNo7X42iX8OyN3vLapR9hSvXNMjxgHOm63nrPsRA/SF1yWZYbVJ7Wum+H36JyAtqndYYDPPeKbSz6atNFktSK1PHmXZMTsctYIdDzGxATAQRa6D5z52S3YOijkGf3riStyYd9onr+ZfdJ/2b5iWw6uDYrbQ8wEl2RocNnSovjjaxLGKi8yV2QYK1T81oTPtq7t7BBgs1ywqCsyritbsogRUtva7jsdOGtBkn/zBtfdh1wGhFieh4ge2cDdTAiiqG8y87qF/JcWq/jcYthR2i1xYlkHYrv2HKquWapFfW8c5msxGLxMC42v7bqMaGlgAdvQrb3grx0XekDVh3UQKMmauoc8mk3dLVbD6Ga0D0vt1B3Z4MBf2W/FJgYEJDaT2a5/rI1Xr4z6GZsyug3aPuoF3Q/89d8D8QmB/X/xktOYE/AQAA//9qYpSQAAAABklEQVQDAFT014f9ZW3MAAAAAElFTkSuQmCC" width="21" height="21" alt=""></span>
       <span class="app-name">EasyAntigravity</span>
       <button class="close" type="button" aria-label="关闭提示" title="关闭">×</button>
     </header>

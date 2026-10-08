@@ -113,6 +113,8 @@ node scripts/preview-ui.cjs
 
 Windows 一体版通知使用 `src/capsule.html`；旧便携模式使用 `scripts/resident/EasyAG-Resident.cs`，修改后运行 `scripts/build-resident.bat` 更新 `assets/EasyAG-Resident.exe`。
 
+图标母版、重新导出和 Windows 启动器图标更新方法见 [docs/ICONS.md](docs/ICONS.md)。
+
 ---
 
 ## 安全说明
