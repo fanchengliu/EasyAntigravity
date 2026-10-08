@@ -96,9 +96,36 @@ namespace EasyAGResident {
         private static TextBlock stateCatText;
         private static TextBlock stateMainText;
         private static TextBlock stateSubText;
-        private static Border actionBtn;
+        private static Button actionBtn;
         private static TextBlock actionBtnText;
-        private static System.Windows.Shapes.Path comicTail;
+        private static bool lightTheme;
+
+        private static SolidColorBrush ThemeBrush(string light, string dark) {
+            return new SolidColorBrush((Color)System.Windows.Media.ColorConverter.ConvertFromString(lightTheme ? light : dark));
+        }
+
+        private static Button FlatButton(object content) {
+            var button = new Button {
+                Content = content,
+                Foreground = ThemeBrush("#202020", "#F5F5F5"),
+                Background = ThemeBrush("#F0F0F0", "#333333"),
+                BorderBrush = ThemeBrush("#DFDFDF", "#414141"),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(14, 5, 14, 5),
+                FontSize = 12,
+                FontWeight = FontWeights.Normal,
+                Cursor = System.Windows.Input.Cursors.Hand
+            };
+            string hover = lightTheme ? "#E8E8E8" : "#3D3D3D";
+            button.Template = (ControlTemplate)System.Windows.Markup.XamlReader.Parse(
+                "<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='Button'>" +
+                "<Border x:Name='Surface' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' CornerRadius='5' Background='{TemplateBinding Background}' BorderBrush='{TemplateBinding BorderBrush}' BorderThickness='{TemplateBinding BorderThickness}' Padding='{TemplateBinding Padding}'>" +
+                "<ContentPresenter HorizontalAlignment='Center' VerticalAlignment='Center'/></Border>" +
+                "<ControlTemplate.Triggers><Trigger Property='IsMouseOver' Value='True'><Setter TargetName='Surface' Property='Background' Value='" + hover + "'/></Trigger>" +
+                "<Trigger Property='IsPressed' Value='True'><Setter TargetName='Surface' Property='Opacity' Value='0.8'/></Trigger>" +
+                "</ControlTemplate.Triggers></ControlTemplate>");
+            return button;
+        }
 
         public static void LogEvent(string json) {
             try {
@@ -270,7 +297,8 @@ namespace EasyAGResident {
                 sep.Margin = new Padding(4, 2, 4, 2);
                 trayMenu.Items.Add(sep);
 
-                var itemExit = trayMenu.Items.Add("退出应用");
+                var itemExit = new ToolStripMenuItem("退出应用");
+                trayMenu.Items.Add(itemExit);
                 itemExit.Padding = new Padding(14, 6, 14, 6);
                 itemExit.ShortcutKeyDisplayString = "Ctrl+Q";
                 itemExit.Click += (s, e) => {
@@ -312,17 +340,25 @@ namespace EasyAGResident {
 
         private static void InitCapsuleWindow() {
             try {
+                try {
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize")) {
+                        lightTheme = key != null && Convert.ToInt32(key.GetValue("AppsUseLightTheme", 0)) != 0;
+                    }
+                } catch { lightTheme = false; }
                 capsuleWin = new Window {
                     Title = "EasyAG_HUD_Capsule",
-                    Width = 390,
-                    Height = 200,
+                    Width = 400,
+                    Height = 218,
                     WindowStyle = WindowStyle.None,
                     AllowsTransparency = true,
                     Background = Brushes.Transparent,
                     Topmost = true,
                     ShowInTaskbar = false,
                     ShowActivated = false,
-                    WindowStartupLocation = WindowStartupLocation.Manual
+                    WindowStartupLocation = WindowStartupLocation.Manual,
+                    FontFamily = new System.Windows.Media.FontFamily("Segoe UI"),
+                    UseLayoutRounding = true,
+                    SnapsToDevicePixels = true
                 };
 
                 try {
@@ -347,77 +383,85 @@ namespace EasyAGResident {
             rootGrid.ClipToBounds = false;
 
             cardGlow = new DropShadowEffect {
-                BlurRadius = 22,
-                ShadowDepth = 0,
-                Opacity = 0.55
+                Color = Colors.Black,
+                BlurRadius = 14,
+                ShadowDepth = 3,
+                Opacity = 0.18
             };
 
             cardBorder = new Border {
-                CornerRadius = new CornerRadius(16),
-                Background = new SolidColorBrush(Color.FromArgb(0xF2, 0x18, 0x1A, 0x20)),
-                BorderThickness = new Thickness(1.5),
-                Margin = new Thickness(10, 10, 10, 16),
+                CornerRadius = new CornerRadius(8),
+                Background = ThemeBrush("#FAFAFA", "#262626"),
+                BorderBrush = ThemeBrush("#DFDFDF", "#414141"),
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(8),
                 Effect = cardGlow
             };
 
-            Grid contentGrid = new Grid { Margin = new Thickness(14, 12, 14, 10) };
+            Grid contentGrid = new Grid { Margin = new Thickness(18, 14, 18, 14) };
             contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             contentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             // Row 0: Header
-            DockPanel header = new DockPanel { LastChildFill = false };
+            DockPanel header = new DockPanel { LastChildFill = true };
             StackPanel titleStack = new StackPanel { Orientation = Orientation.Horizontal };
             stateDot = new Ellipse {
-                Width = 9,
-                Height = 9,
-                Margin = new Thickness(0, 0, 7, 0),
+                Width = 5,
+                Height = 5,
+                Margin = new Thickness(0, 0, 6, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
             stateCatText = new TextBlock {
-                FontWeight = FontWeights.Bold,
-                FontSize = 12,
+                FontWeight = FontWeights.Normal,
+                FontSize = 11,
                 VerticalAlignment = VerticalAlignment.Center
             };
             titleStack.Children.Add(stateDot);
             titleStack.Children.Add(stateCatText);
-            DockPanel.SetDock(titleStack, Dock.Left);
-            header.Children.Add(titleStack);
-
-            Button closeBtn = new Button {
-                Content = "✕",
-                Foreground = new SolidColorBrush(Color.FromRgb(0x94, 0xA3, 0xB8)),
-                Background = Brushes.Transparent,
-                BorderThickness = new Thickness(0),
-                FontSize = 12,
-                Cursor = System.Windows.Input.Cursors.Hand,
-                Padding = new Thickness(4, 0, 4, 0)
-            };
+            Button closeBtn = FlatButton("×");
+            closeBtn.FontSize = 18;
+            closeBtn.Width = 26;
+            closeBtn.Height = 26;
+            closeBtn.Padding = new Thickness(0);
+            closeBtn.Margin = new Thickness(0, -3, -6, -3);
+            closeBtn.Background = Brushes.Transparent;
+            closeBtn.BorderThickness = new Thickness(0);
+            closeBtn.ToolTip = "关闭提示";
+            System.Windows.Automation.AutomationProperties.SetName(closeBtn, "关闭提示");
             closeBtn.Click += (s, e) => {
                 HideCapsule();
                 LogEvent("{\"event\":\"capsule_close\"}");
             };
             DockPanel.SetDock(closeBtn, Dock.Right);
             header.Children.Add(closeBtn);
+            var appName = new TextBlock {
+                Text = "EasyAntigravity",
+                FontSize = 12,
+                Foreground = ThemeBrush("#616161", "#B5B5B5"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            header.Children.Add(appName);
             Grid.SetRow(header, 0);
             contentGrid.Children.Add(header);
 
             // Row 1: Body
-            StackPanel body = new StackPanel { Margin = new Thickness(0, 6, 0, 6) };
+            StackPanel body = new StackPanel { Margin = new Thickness(0, 12, 0, 10) };
             stateMainText = new TextBlock {
                 FontWeight = FontWeights.SemiBold,
-                FontSize = 12,
-                Foreground = Brushes.White,
-                TextWrapping = TextWrapping.NoWrap,
-                TextTrimming = TextTrimming.CharacterEllipsis
-            };
-            stateSubText = new TextBlock {
-                FontSize = 11,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x94, 0xA3, 0xB8)),
-                Margin = new Thickness(0, 4, 0, 0),
+                FontSize = 14,
+                Foreground = ThemeBrush("#202020", "#F5F5F5"),
                 TextWrapping = TextWrapping.Wrap,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                MaxHeight = 58
+                MaxHeight = 40
+            };
+            stateSubText = new TextBlock {
+                FontSize = 12,
+                Foreground = ThemeBrush("#616161", "#B5B5B5"),
+                Margin = new Thickness(0, 7, 0, 0),
+                TextWrapping = TextWrapping.Wrap,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                MaxHeight = 36
             };
             body.Children.Add(stateMainText);
             body.Children.Add(stateSubText);
@@ -425,36 +469,26 @@ namespace EasyAGResident {
             contentGrid.Children.Add(body);
 
             // Row 2: Action Button
-            actionBtn = new Border {
-                CornerRadius = new CornerRadius(8),
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
-                Padding = new Thickness(12, 5, 12, 5),
-                Cursor = System.Windows.Input.Cursors.Hand
-            };
             actionBtnText = new TextBlock {
-                FontWeight = FontWeights.Bold,
-                FontSize = 11.5
+                FontWeight = FontWeights.Normal,
+                FontSize = 12,
+                Foreground = ThemeBrush("#202020", "#F5F5F5")
             };
-            actionBtn.Child = actionBtnText;
-            actionBtn.MouseLeftButtonUp += (s, e) => {
+            actionBtn = FlatButton(actionBtnText);
+            actionBtn.MinHeight = 30;
+            actionBtn.Click += (s, e) => {
                 HandleCapsuleAction();
             };
-            Grid.SetRow(actionBtn, 2);
-            contentGrid.Children.Add(actionBtn);
+            DockPanel footer = new DockPanel { LastChildFill = true };
+            DockPanel.SetDock(actionBtn, Dock.Right);
+            footer.Children.Add(actionBtn);
+            titleStack.VerticalAlignment = VerticalAlignment.Center;
+            footer.Children.Add(titleStack);
+            Grid.SetRow(footer, 2);
+            contentGrid.Children.Add(footer);
 
             cardBorder.Child = contentGrid;
             rootGrid.Children.Add(cardBorder);
-
-            // Comic Tail
-            comicTail = new System.Windows.Shapes.Path {
-                Data = Geometry.Parse("M 0,0 L 8,9 L 16,0 Z"),
-                Fill = new SolidColorBrush(Color.FromArgb(0xF2, 0x18, 0x1A, 0x20)),
-                StrokeThickness = 1.2,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(0, 0, 36, 8)
-            };
-            rootGrid.Children.Add(comicTail);
 
             capsuleWin.Content = rootGrid;
             } catch { }
@@ -464,57 +498,41 @@ namespace EasyAGResident {
             currentType = type;
             if (type == "danger" || type == "risk_high") {
                 // 🚨 命中危险命令
-                Color rose = Color.FromRgb(0xFB, 0x71, 0x85);
-                cardBorder.BorderBrush = new SolidColorBrush(rose);
-                cardGlow.Color = rose;
-                comicTail.Stroke = new SolidColorBrush(rose);
-                stateDot.Fill = new SolidColorBrush(rose);
-                stateCatText.Text = "命中危险命令";
-                stateCatText.Foreground = new SolidColorBrush(rose);
+                var rose = ThemeBrush("#B42318", "#F0A09C");
+                stateDot.Fill = rose;
+                stateCatText.Text = "高风险命令";
+                stateCatText.Foreground = rose;
 
                 stateMainText.Text = string.IsNullOrEmpty(titleText) ? "命中危险指令" : titleText;
                 stateSubText.Text = string.IsNullOrEmpty(subText) ? "已阻断自动放行，需人工核查确认。" : subText;
 
-                actionBtn.Background = new SolidColorBrush(Color.FromRgb(0xE1, 0x1D, 0x48));
-                actionBtnText.Foreground = Brushes.White;
-                actionBtnText.Text = "前往审查 ↵";
+                actionBtnText.Text = "前往审查";
 
             } else if (type == "interaction" || type == "risk_medium" || type == "risk_low") {
                 // 等待方案决策
-                Color tone = type == "risk_medium" ? Color.FromRgb(0xF5, 0x9E, 0x0B)
-                    : type == "risk_low" ? Color.FromRgb(0x38, 0xBD, 0xF8)
-                    : Color.FromRgb(0x00, 0xF5, 0xD4);
-                cardBorder.BorderBrush = new SolidColorBrush(tone);
-                cardGlow.Color = tone;
-                comicTail.Stroke = new SolidColorBrush(tone);
-                stateDot.Fill = new SolidColorBrush(tone);
-                stateCatText.Text = type == "risk_medium" ? "中风险命令" : type == "risk_low" ? "低风险提醒" : "等待方案决策";
-                stateCatText.Foreground = new SolidColorBrush(tone);
+                var tone = type == "risk_medium" ? ThemeBrush("#895B08", "#E8C281") : ThemeBrush("#0F6CBD", "#95C6F5");
+                stateDot.Fill = tone;
+                stateCatText.Text = type == "risk_medium" ? "中风险命令" : type == "risk_low" ? "低风险提醒" : "等待你的选择";
+                stateCatText.Foreground = tone;
 
                 stateMainText.Text = string.IsNullOrEmpty(titleText) ? "方案问答：等待您选择决策方案" : titleText;
                 stateSubText.Text = string.IsNullOrEmpty(subText) ? "Agent 暂缓后续操作，等待您的指引。" : subText;
 
-                actionBtn.Background = new SolidColorBrush(tone);
-                actionBtnText.Foreground = new SolidColorBrush(Color.FromRgb(0x0B, 0x0C, 0x10));
-                actionBtnText.Text = "前往选择 ↵";
+                actionBtnText.Text = type == "interaction" ? "前往选择" : "前往审查";
 
             } else {
                 // 本轮任务完成
-                Color emerald = Color.FromRgb(0x10, 0xB9, 0x81);
-                cardBorder.BorderBrush = new SolidColorBrush(emerald);
-                cardGlow.Color = emerald;
-                comicTail.Stroke = new SolidColorBrush(emerald);
-                stateDot.Fill = new SolidColorBrush(emerald);
-                stateCatText.Text = "本轮任务完成";
-                stateCatText.Foreground = new SolidColorBrush(emerald);
+                var emerald = ThemeBrush("#217346", "#95CFAA");
+                stateDot.Fill = emerald;
+                stateCatText.Text = "任务已完成";
+                stateCatText.Foreground = emerald;
 
                 stateMainText.Text = string.IsNullOrEmpty(titleText) ? "生成完毕，所有步骤已就绪" : titleText;
                 stateSubText.Text = string.IsNullOrEmpty(subText) ? "代码已就绪，随时可检视或开启下一轮。" : subText;
 
-                actionBtn.Background = new SolidColorBrush(emerald);
-                actionBtnText.Foreground = new SolidColorBrush(Color.FromRgb(0x0B, 0x0C, 0x10));
-                actionBtnText.Text = "前往查看 ↵";
+                actionBtnText.Text = "查看结果";
             }
+            System.Windows.Automation.AutomationProperties.SetName(actionBtn, actionBtnText.Text);
         }
 
         private static void ShowCapsule(string type, string titleText, string subText) {

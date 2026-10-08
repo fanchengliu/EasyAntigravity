@@ -44,4 +44,5 @@ injected-ask.json
 easyag-pretool-hook.cjs
 easyag-stop-hook.cjs
 .playwright-cli/
+.ui-preview/
 rules/feeds/*.local.json
