@@ -1525,6 +1525,21 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ ok: false, error: String(e.message || e) }));
     }
   }
+  if (req.url === '/api/notification/preview' && req.method === 'POST') {
+    sendResident({
+      cmd: 'show_capsule', type: 'risk_high',
+      title: '通知样式预览',
+      detail: '这是一条预览提示，不会执行命令，也不会修改审批设置。'
+    });
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    return res.end(JSON.stringify({ ok: true }));
+  }
+  if (req.url === '/api/notification/hide' && req.method === 'POST') {
+    if (capsuleHideTimer) { clearTimeout(capsuleHideTimer); capsuleHideTimer = null; }
+    sendResident({ cmd: 'hide_capsule' });
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    return res.end(JSON.stringify({ ok: true }));
+  }
   if (req.url === '/api/agent-event' && req.method === 'POST') {
     let body = '';
     req.on('data', c => body += c);

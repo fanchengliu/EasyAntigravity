@@ -14,10 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - runner: windows-latest
-          #   target: x86_64-pc-windows-msvc
-          #   build-args: --no-bundle
-          #   name: windows-x64
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            build-args: --no-bundle
+            name: windows-x64
           - runner: macos-14
             target: aarch64-apple-darwin
             build-args: --bundles app
@@ -80,7 +80,7 @@ jobs:
           Compress-Archive -LiteralPath $stage -DestinationPath "$name.zip"
           Expand-Archive -LiteralPath "$name.zip" -DestinationPath 'dist-tauri/verify'
           $extracted = (Resolve-Path "dist-tauri/verify/$name").Path
-          foreach ($file in @('EasyAntigravity.exe','easyag-node.exe','backend/server.js','backend/index.html','backend/dicts/common.json','backend/dicts/ui_v2.json','backend/danger-rules.json','backend/node_modules/ws/package.json','backend/NODE-LICENSE.txt')) {
+          foreach ($file in @('EasyAntigravity.exe','easyag-node.exe','backend/server.js','backend/index.html','backend/capsule.html','backend/knowledge/signatures.json','backend/dicts/common.json','backend/dicts/ui_v2.json','backend/danger-rules.json','backend/node_modules/ws/package.json','backend/NODE-LICENSE.txt')) {
             if (-not (Test-Path -LiteralPath (Join-Path $extracted $file))) { throw "Missing portable resource: $file" }
           }
           $env:EASYAG_TEST_NODE = Join-Path $extracted 'easyag-node.exe'

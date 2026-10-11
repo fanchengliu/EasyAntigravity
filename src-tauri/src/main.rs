@@ -88,16 +88,15 @@ fn ensure_capsule(app: &tauri::AppHandle) {
     if app.get_webview_window("capsule").is_some() {
         return;
     }
-    // 从本地 backend 加载，便于热更新胶囊页（不嵌入 exe）
-    let port = app.state::<Backend>().port.lock().ok().and_then(|p| *p);
-    let url = match port {
-        Some(p) => match format!("http://127.0.0.1:{p}/capsule.html").parse() {
-            Ok(u) => WebviewUrl::External(u),
-            Err(_) => WebviewUrl::App("capsule.html".into()),
-        },
-        None => WebviewUrl::App("capsule.html".into()),
+    // Only create notifications after the backend is ready. An early bundled
+    // fallback stays alive for the entire session and bypasses updated HTML.
+    let Some(port) = app.state::<Backend>().port.lock().ok().and_then(|p| *p) else {
+        return;
     };
-    let _ = WebviewWindowBuilder::new(app, "capsule", url)
+    let Ok(url) = format!("http://127.0.0.1:{port}/capsule.html").parse() else {
+        return;
+    };
+    let _ = WebviewWindowBuilder::new(app, "capsule", WebviewUrl::External(url))
         .title("EasyAG Capsule")
         .decorations(false)
         .always_on_top(true)
@@ -339,7 +338,6 @@ fn main() {
         })
         .setup(|app| {
             let _ = setup_tray(app);
-            ensure_capsule(app.handle());
             #[cfg(target_os = "macos")]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.set_title("EasyAntigravity (macOS Beta)");

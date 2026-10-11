@@ -111,6 +111,8 @@ node scripts/preview-ui.cjs
 
 用浏览器打开生成的 `.ui-preview/index.html`，可以切换通知状态和明暗主题。预览直接读取面板与通知源码，使用独立演示数据，不启动 Antigravity、不访问实际后端，也不修改用户设置。
 
+面板日志区的「预览通知」按钮会显示实际的原生通知窗口，可用于检查本机通知样式和关闭操作；它不执行命令、不修改审批设置，也不计入风险统计。
+
 Windows 一体版通知使用 `src/capsule.html`；旧便携模式使用 `scripts/resident/EasyAG-Resident.cs`，修改后运行 `scripts/build-resident.bat` 更新 `assets/EasyAG-Resident.exe`。
 
 图标母版、重新导出和 Windows 启动器图标更新方法见 [docs/ICONS.md](docs/ICONS.md)。

@@ -115,7 +115,15 @@
       clearTimeout(hideTimer);
       hideTimer = 0;
       notice.classList.add('leaving');
-      setTimeout(function () {
+      setTimeout(async function () {
+        // HTTP notification pages use the backend's native window channel.
+        // They do not need remote access to privileged Tauri commands.
+        if (location.protocol === 'http:' || location.protocol === 'https:') {
+          try {
+            const response = await fetch('/api/notification/hide', { method: 'POST' });
+            if (response.ok) return;
+          } catch (e) {}
+        }
         try {
           var t = window.__TAURI__;
           var win = t && (

@@ -24,6 +24,11 @@ assert.match(rust, /work_area\(\)/, '定位必须使用显示器工作区，避�
 assert.match(rust, /get_webview_window\("main"\)/, '定位应优先跟随主窗口所在显示器');
 assert.match(rust, /solution: &str/, '风险建议必须传入胶囊');
 assert.match(rust, /capsule\.html/, '胶囊页可从本地服务加载以便热更新');
+const capsuleCreation = rust.slice(rust.indexOf('fn ensure_capsule('), rust.indexOf('fn show_capsule('));
+assert.doesNotMatch(capsuleCreation, /WebviewUrl::App/, '通知不能回退到启动器内嵌页面');
+const setup = rust.slice(rust.indexOf('.setup(|app|'), rust.indexOf('.on_window_event('));
+assert.doesNotMatch(setup, /ensure_capsule/, '后端启动前不得预创建通知窗口');
+assert.match(html, /\/api\/notification\/hide/, 'HTTP 通知应通过后端隐藏原生窗口');
 assert.match(resident, /RestartAutoHide/, '旧便携 Resident 胶囊也必须自动消失');
 assert.match(resident, /Screen\.FromHandle\(agHwnd\)/, 'Resident 胶囊应跟随 AG 所在显示器');
 assert.equal(config.app.withGlobalTauri, true);

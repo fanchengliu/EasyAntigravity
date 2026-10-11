@@ -23,6 +23,11 @@ const capsuleSrc = path.join(root, 'src', 'capsule.html');
 if (fs.existsSync(capsuleSrc)) {
   fs.copyFileSync(capsuleSrc, path.join(backend, 'capsule.html'));
 }
+// ARES must also be present in the portable package, not just the source tree.
+const signatures = path.join(root, 'Agentguard-dev', 'src', 'rules', 'signatures.json');
+assert.ok(fs.existsSync(signatures), 'Missing ARES signatures');
+fs.mkdirSync(path.join(backend, 'knowledge'), { recursive: true });
+fs.copyFileSync(signatures, path.join(backend, 'knowledge', 'signatures.json'));
 fs.cpSync(path.dirname(require.resolve('ws/package.json')), path.join(backend, 'node_modules', 'ws'), { recursive: true });
 fs.mkdirSync(path.join(root, 'src-tauri', 'binaries'), { recursive: true });
 const runtime = path.join(root, 'src-tauri', 'binaries', 'easyag-node-' + triple + (process.platform === 'win32' ? '.exe' : ''));

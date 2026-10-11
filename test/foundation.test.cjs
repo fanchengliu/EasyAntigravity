@@ -81,6 +81,24 @@ async function start() {
     assert.deepEqual(JSON.parse(fs.readFileSync(app.agConfig, 'utf8')), app.initialConfig,
       '点击启动 AG 前不得改动官方配置');
 
+    const notificationMessages = [];
+    const onNotification = chunk => notificationMessages.push(chunk.toString());
+    app.child.stdout.on('data', onNotification);
+    const preview = await fetch(app.url + '/api/notification/preview', { method: 'POST' });
+    assert.equal(preview.status, 200);
+    await delay(50);
+    assert.ok(notificationMessages.join('').includes('"cmd":"show_capsule"'));
+    assert.ok(notificationMessages.join('').includes('通知样式预览'));
+    const hideNotification = await fetch(app.url + '/api/notification/hide', { method: 'POST' });
+    assert.equal(hideNotification.status, 200);
+    await delay(50);
+    assert.ok(notificationMessages.join('').includes('hide_capsule'));
+    app.child.stdout.off('data', onNotification);
+    const afterPreview = await (await fetch(app.url + '/api/status')).json();
+    assert.equal(afterPreview.riskHits, status.riskHits, '预览不得计入风险统计');
+    assert.deepEqual(JSON.parse(fs.readFileSync(app.agConfig, 'utf8')), app.initialConfig,
+      '通知预览不得修改官方配置');
+
     // sync 必须同时写入 ASK 与 Turbo，并且通过写后校验。
     const sync = await fetch(app.url + '/api/danger-rules/sync', {
       method: 'POST',
